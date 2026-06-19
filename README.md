@@ -3,7 +3,7 @@
 On-device hybrid search for markdown knowledge bases. BM25 + vector + LLM reranking with link graphs, time decay, and HyDE. Designed for [pi](https://github.com/earendil-works/pi) coding agent.
 
 ```bash
-npm install -g @pi/mnemonic
+npm install -g @naveenadi/mnemonic
 mne init
 mne collection add ~/notes --name notes
 mne index
@@ -52,7 +52,7 @@ Configure MCP in `~/.pi/agent/mcp.json`:
 ## Architecture
 
 ```
-                    Core SDK (@pi/mnemonic)
+                    Core SDK (@naveenadi/mnemonic)
     Store (SQLite FTS5 + vec)  |  Search Pipeline  |  Chunker
                     LLM Backend (Ollama <-> node-llama-cpp)
                     Link Graph  |  Time Decay  |  HyDE

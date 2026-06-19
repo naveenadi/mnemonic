@@ -2,7 +2,7 @@
 name: mnemonic
 description: Search local markdown knowledge bases, notes, docs, and wikis with mnemonic. Hybrid BM25 + vector + LLM reranking. Use when users ask to find notes, retrieve documents, or answer from indexed markdown.
 license: MIT
-compatibility: Requires mnemonic CLI. Install via `npm install -g @pi/mnemonic`. Initialize with `mne init`.
+compatibility: Requires mnemonic CLI. Install via `npm install -g @naveenadi/mnemonic`. Initialize with `mne init`.
 metadata:
   version: "0.1.0"
 allowed-tools: Bash(mne:*)
@@ -130,7 +130,7 @@ mne query "deployment" --boost-links    # Boost results with many backlinks
 Only mutate indexes when the user asked for setup or maintenance.
 
 ```bash
-npm install -g @pi/mnemonic
+npm install -g @naveenadi/mnemonic
 mne init
 mne collection add ~/notes --name notes
 mne collection add ~/Documents --name docs --mask "**/*.md"

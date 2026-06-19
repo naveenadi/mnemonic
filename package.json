@@ -1,5 +1,5 @@
 {
-  "name": "@pi/mnemonic",
+  "name": "@naveenadi/mnemonic",
   "version": "0.1.0",
   "description": "On-device hybrid search for markdown knowledge bases. BM25 + vector + LLM reranking with link graphs, time decay, and HyDE. Designed for pi coding agent.",
   "type": "module",
