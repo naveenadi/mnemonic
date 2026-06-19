@@ -1,0 +1,21 @@
+src/pi-extension/index.ts
+  s_e5486ad1894750::t_29ca35da5e9f62 4-5,16-263,333
+SKILL.md
+  s_e5486ad1894750::t_2ce8631df46900 76-89
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "128c6beccf71efe1097a9ec02c6b206f45c8c36c",
+  "prompts": {},
+  "sessions": {
+    "s_e5486ad1894750": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019ee085-4faf-7b1a-a2ce-be255bcc7358",
+        "model": "mimo-v2.5-pro"
+      },
+      "human_author": "Aditya Agarwal <naveenaditya123451@gmail.com>"
+    }
+  }
+}
