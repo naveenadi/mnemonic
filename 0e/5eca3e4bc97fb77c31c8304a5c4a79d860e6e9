@@ -1,0 +1,28 @@
+README.md
+  s_e5486ad1894750::t_17f8e356628473 48,50-54,56,59,71-100
+  s_e5486ad1894750::t_f331630c35e34f 145-146,148
+src/pi-extension/package.json
+  s_e5486ad1894750::t_3f531ab38dbadc 1-11
+package.json
+  s_e5486ad1894750::t_fd66d2517c886d 16-17
+references/setup.md
+  s_e5486ad1894750::t_62365551763ca8 27-73
+SKILL.md
+  s_e5486ad1894750::t_e885bb2d904143 84-96
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "0e5eca3e4bc97fb77c31c8304a5c4a79d860e6e9",
+  "prompts": {},
+  "sessions": {
+    "s_e5486ad1894750": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019ee085-4faf-7b1a-a2ce-be255bcc7358",
+        "model": "mimo-v2.5-pro"
+      },
+      "human_author": "Aditya Agarwal <naveenaditya123451@gmail.com>"
+    }
+  }
+}
