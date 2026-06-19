@@ -1,7 +1,7 @@
 # ADR-0003: Pluggable LLM Backend via Factory Pattern
 
 **Status**: Accepted  
-**Date**: 2026-01-15
+**Date**: 2026-06-20
 
 ## Context
 

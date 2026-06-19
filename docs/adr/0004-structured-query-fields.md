@@ -1,7 +1,7 @@
 # ADR-0004: Structured Query Fields for Deliberate Retrieval
 
 **Status**: Accepted  
-**Date**: 2026-01-15
+**Date**: 2026-06-20
 
 ## Context
 

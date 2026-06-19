@@ -1,7 +1,7 @@
 # ADR-0001: SQLite as the Single Storage Engine
 
 **Status**: Accepted  
-**Date**: 2026-01-15 (inferred from project inception)
+**Date**: 2026-06-20 (inferred from project inception)
 
 ## Context
 

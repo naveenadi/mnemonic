@@ -3,9 +3,11 @@
   "version": "0.1.0",
   "description": "Pi extension for mnemonic — 4 custom tools for local markdown search",
   "dependencies": {
-    "@naveenadi/mnemonic": "^0.1.0"
+    "@naveenadi/mnemonic": "^0.2.3"
   },
   "pi": {
-    "extensions": ["./index.ts"]
+    "extensions": [
+      "./index.ts"
+    ]
   }
 }
