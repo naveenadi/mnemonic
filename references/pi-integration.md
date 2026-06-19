@@ -2,6 +2,23 @@
 
 mnemonic integrates with pi at three layers. Each can be installed **globally** (all projects) or **project-local** (per-repo).
 
+## Interactive setup — /mne init
+
+If the extension is loaded, type `/mne init` in pi to walk through everything:
+
+```
+/mne init
+  → Choose global or project-local scope
+  → Enter directories to index
+  → Index files, embed (if Ollama available)
+  → Optionally configure MCP in mcp.json
+  → Optionally install skill (SKILL.md)
+```
+
+Other commands:
+- `/mne add <path>` — quick-add a collection
+- `/mne status` — index health summary
+
 ## MCP Server
 
 Exposes typed tools (`query`, `get`, `multi_get`, `status`) over stdio.

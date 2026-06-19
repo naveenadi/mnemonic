@@ -45,13 +45,26 @@ mne --db .mnemonic/index.sqlite query "deploy steps"
 
 ## Pi Integration
 
-Three layers, each installable **globally** (all projects) or **per project**.
+Three layers plus an interactive setup command, each installable **globally** (all projects) or **per project**.
 
 | Layer | What | Global path | Per-project path |
 |---|---|---|---|
+| **Interactive** | `/mne init` walks through setup | — | — |
 | **MCP server** | Typed tools: `query`, `get`, `multi_get`, `status` | `~/.pi/agent/mcp.json` | `.pi/mcp.json` |
 | **Pi skill** | Bash commands via `SKILL.md` | `~/.pi/agent/skills/mnemonic/` | `.pi/skills/mnemonic/` |
-| **Pi extension** | 4 custom `pi.registerTool()` calls | `~/.pi/agent/extensions/mnemonic/` | `.pi/extensions/mnemonic/` |
+| **Pi extension** | 4 tools + `/mne` command via `pi.registerTool/Command` | `~/.pi/agent/extensions/mnemonic/` | `.pi/extensions/mnemonic/` |
+
+### Interactive setup (extension required)
+
+After installing the extension and running `/reload`, type:
+
+```
+/mne init
+```
+
+This walks through: scope (global vs project) → add directories → index → embed → configure MCP → install skill.
+
+Other commands: `/mne add <path>`, `/mne status`, `/mne help`.
 
 ### MCP — global
 
