@@ -1,0 +1,21 @@
+README.md
+  s_e5486ad1894750::t_ef7b7e9fc1eb9b 1-93
+.gitignore
+  s_e5486ad1894750::t_7965f79738d0e2 1-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "1ea7b1ed1d94e8a250fddddc78c4192057a6583c",
+  "prompts": {},
+  "sessions": {
+    "s_e5486ad1894750": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019ee085-4faf-7b1a-a2ce-be255bcc7358",
+        "model": "mimo-v2.5-pro"
+      },
+      "human_author": "Aditya Agarwal <naveenaditya123451@gmail.com>"
+    }
+  }
+}
