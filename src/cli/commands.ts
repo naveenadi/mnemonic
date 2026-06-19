@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync } from 'node:fs';
 import { homedir } from 'node:os';
-import { resolve, join, relative } from 'node:path';
+import { resolve, join, relative, dirname } from 'node:path';
 import { MnemonicDB, loadConfig } from '../store/database.js';
 import { DocumentStore, docid } from '../store/documents.js';
 import { CollectionStore } from '../store/collections.js';
@@ -169,8 +169,7 @@ async function getLLM(verbose: boolean): Promise<LLMBackend | undefined> {
 }
 
 function cmdInit(_args: string[], dbPath: string) {
-  const dir = resolve(homedir(), '.cache', 'mnemonic');
-  mkdirSync(dir, { recursive: true });
+  mkdirSync(dirname(dbPath), { recursive: true });
 
   const db = new MnemonicDB(dbPath);
   db.init();
