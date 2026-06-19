@@ -1,0 +1,23 @@
+src/cli/commands.ts
+  s_e5486ad1894750::t_374f4bc7a087c8 53
+  s_e5486ad1894750::t_5a97f57ea78da0 52
+  s_e5486ad1894750::t_d39c510672575c 27-29
+  s_e5486ad1894750::t_fc2745439635de 25-26,30-32
+  s_e5486ad1894750::t_f61c929be055f2 146
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "b00c9d749cc293be052c0178934c03fab0dc32df",
+  "prompts": {},
+  "sessions": {
+    "s_e5486ad1894750": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019ee085-4faf-7b1a-a2ce-be255bcc7358",
+        "model": "mimo-v2.5-pro"
+      },
+      "human_author": "Aditya Agarwal <naveenaditya123451@gmail.com>"
+    }
+  }
+}
