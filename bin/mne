@@ -1,0 +1,8 @@
+#!/usr/bin/env node
+// ESM-compatible entry point
+import('../dist/cli/commands.js').then((mod) => {
+  mod.main(process.argv.slice(2)).catch((err) => {
+    console.error('Error:', err.message);
+    process.exit(1);
+  });
+});

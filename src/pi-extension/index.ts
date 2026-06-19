@@ -1,0 +1,222 @@
+import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
+import { Type } from 'typebox';
+import { homedir } from 'node:os';
+import { join } from 'node:path';
+
+export default function (pi: ExtensionAPI) {
+  const dbPath = join(homedir(), '.cache', 'mnemonic', 'index.sqlite');
+
+  // ─── Tool: mnemonic_search ─────────────────────────────────────
+  pi.registerTool({
+    name: 'mnemonic_search',
+    label: 'Mnemonic Search',
+    description: 'Search indexed markdown knowledge bases with BM25 full-text search. Fast, no LLM needed.',
+    promptSnippet: 'Search local markdown knowledge bases',
+    promptGuidelines: [
+      'Use mnemonic_search when you need to find information in the user\'s indexed markdown notes, docs, or wikis before resorting to web search.',
+      'Use mnemonic_query for semantic/conceptual searches; prefer mnemonic_search when you know exact terms.',
+    ],
+    parameters: Type.Object({
+      query: Type.String({ description: 'Search query (keywords or phrases)' }),
+      collection: Type.Optional(Type.String({ description: 'Filter by collection name' })),
+      limit: Type.Optional(Type.Number({ default: 10, description: 'Number of results' })),
+    }),
+    async execute(toolCallId, params, signal, onUpdate, ctx) {
+      const { query, collection, limit } = params;
+
+      const { MnemonicDB } = await import('../store/database.js');
+      const { SearchPipeline } = await import('../search/pipeline.js');
+      const db = new MnemonicDB(dbPath);
+      db.init();
+      const pipeline = new SearchPipeline(db);
+      const results = pipeline.searchLex(query, {
+        collection: collection ? [collection] : undefined,
+        limit: limit ?? 10,
+      });
+      db.close();
+
+      const text = results.length === 0
+        ? 'No results found.'
+        : results.map((r, i) =>
+            `${i + 1}. ${r.path}  #${r.docid}\n   Title: ${r.title}\n   Score: ${Math.round(r.score * 100)}%\n   ${r.snippet || ''}`
+          ).join('\n\n');
+
+      return {
+        content: [{ type: 'text', text }],
+        details: { count: results.length, results },
+      };
+    },
+  });
+
+  // ─── Tool: mnemonic_query ─────────────────────────────────────
+  pi.registerTool({
+    name: 'mnemonic_query',
+    label: 'Mnemonic Query',
+    description: 'Hybrid semantic search over indexed markdown. Uses BM25 + vector search + optional LLM reranking for best quality. Use when the user asks conceptual questions or doesn\'t use exact keywords.',
+    promptSnippet: 'Hybrid semantic search over markdown knowledge bases',
+    promptGuidelines: [
+      'Use mnemonic_query for conceptual or indirect questions where exact terms aren\'t known.',
+      'Prefer mnemonic_query over mnemonic_search for most questions — it returns better results.',
+      'Supply the intent parameter when the user\'s wording is ambiguous to disambiguate between nearby concepts.',
+    ],
+    parameters: Type.Object({
+      query: Type.String({ description: 'Natural language search query' }),
+      intent: Type.Optional(Type.String({ description: 'Disambiguation context. States what you want to find AND what to avoid.' })),
+      collection: Type.Optional(Type.String({ description: 'Filter by collection name' })),
+      limit: Type.Optional(Type.Number({ default: 10, description: 'Number of results' })),
+      rerank: Type.Optional(Type.Boolean({ default: true, description: 'Run LLM reranking for better quality' })),
+    }),
+    async execute(toolCallId, params, signal, onUpdate, ctx) {
+      const { query, intent, collection, limit, rerank } = params;
+
+      const { MnemonicDB } = await import('../store/database.js');
+      const { SearchPipeline } = await import('../search/pipeline.js');
+      const { detectLLMBackend } = await import('../llm/factory.js');
+
+      const db = new MnemonicDB(dbPath);
+      db.init();
+      await db.loadVectors();
+      const pipeline = new SearchPipeline(db);
+
+      // Try to get LLM for reranking
+      try {
+        const { backend } = await detectLLMBackend();
+        pipeline.setLLM(backend);
+      } catch {
+        // No LLM — search will fall back to BM25 only
+      }
+
+      const results = await pipeline.search({
+        query,
+        intent,
+        collection: collection ? [collection] : undefined,
+        limit: limit ?? 10,
+        rerank: rerank !== false,
+        expand: true,
+        hyde: true,
+      });
+
+      // Cleanup LLM if loaded
+      if ((pipeline as any).llm) {
+        await (pipeline as any).llm.close();
+      }
+      db.close();
+
+      const text = results.length === 0
+        ? 'No results found.'
+        : results.map((r, i) =>
+            `${i + 1}. ${r.path}  #${r.docid}\n   Title: ${r.title}\n   Score: ${Math.round(r.score * 100)}%${r.context.length ? `\n   Context: ${r.context.join(' > ')}` : ''}${r.tags.length ? `\n   Tags: ${r.tags.join(', ')}` : ''}\n   ${r.snippet || ''}`
+          ).join('\n\n');
+
+      return {
+        content: [{ type: 'text', text }],
+        details: { count: results.length, results },
+      };
+    },
+  });
+
+  // ─── Tool: mnemonic_get ───────────────────────────────────────
+  pi.registerTool({
+    name: 'mnemonic_get',
+    label: 'Mnemonic Get',
+    description: 'Retrieve a full document from the mnemonic index by path or docid (#abc123). Supports line ranges with :from:count suffix.',
+    promptSnippet: 'Retrieve a full indexed document',
+    promptGuidelines: [
+      'Use mnemonic_get after mnemonic_search or mnemonic_query to retrieve the full content of a matched document before answering.',
+      'Use the :from:count suffix to read specific line ranges instead of fetching full documents.',
+    ],
+    parameters: Type.Object({
+      file: Type.String({ description: 'Path, docid (#abc123), or path:from:count (e.g. #abc123:50:40)' }),
+      maxLines: Type.Optional(Type.Number({ default: 100, description: 'Maximum lines to return' })),
+      fromLine: Type.Optional(Type.Number({ description: 'Start line (1-indexed)' })),
+      lineNumbers: Type.Optional(Type.Boolean({ default: true, description: 'Prefix lines with numbers' })),
+    }),
+    async execute(toolCallId, params, signal, onUpdate, ctx) {
+      const { file, maxLines, fromLine, lineNumbers } = params;
+
+      const { MnemonicDB } = await import('../store/database.js');
+      const { DocumentStore } = await import('../store/documents.js');
+      const db = new MnemonicDB(dbPath);
+      db.init();
+      const docs = new DocumentStore(db);
+
+      const result = docs.getBody(file, { fromLine, maxLines });
+
+      if ('error' in result) {
+        db.close();
+        return {
+          content: [{ type: 'text', text: `Document not found: ${file}${(result as any).similarFiles?.length ? `\nSimilar: ${(result as any).similarFiles.join(', ')}` : ''}` }],
+          isError: true,
+        };
+      }
+
+      const meta = docs.get(file) as any;
+      db.close();
+
+      let output = '';
+      if (!('error' in meta)) {
+        output += `mne://${meta.collection}/${meta.path}  #${meta.docid}\n---\n`;
+      }
+
+      if (lineNumbers !== false) {
+        const start = fromLine ?? 1;
+        result.content.split('\n').forEach((line: string, i: number) => {
+          output += `${start + i}: ${line}\n`;
+        });
+      } else {
+        output += result.content;
+      }
+
+      return {
+        content: [{ type: 'text', text: output }],
+        details: { totalLines: result.totalLines, docid: ('error' in meta) ? undefined : meta.docid },
+      };
+    },
+  });
+
+  // ─── Tool: mnemonic_status ─────────────────────────────────────
+  pi.registerTool({
+    name: 'mnemonic_status',
+    label: 'Mnemonic Status',
+    description: 'Show mnemonic index status: collections, document counts, vector status, and cache health.',
+    promptSnippet: 'Show mnemonic knowledge base status',
+    promptGuidelines: [
+      'Use mnemonic_status at the start of a session to check what knowledge bases are available.',
+    ],
+    parameters: Type.Object({}),
+    async execute(toolCallId, params, signal, onUpdate, ctx) {
+      const { MnemonicDB } = await import('../store/database.js');
+      const { CollectionStore } = await import('../store/collections.js');
+      const { existsSync, readFileSync } = await import('node:fs');
+
+      const db = new MnemonicDB(dbPath);
+      db.init();
+      const collections = new CollectionStore(db);
+      const cols = collections.list();
+
+      const docCount = (db.db.prepare('SELECT COUNT(*) as c FROM documents').get() as any).c;
+      const chunkCount = (db.db.prepare('SELECT COUNT(*) as c FROM chunks').get() as any).c;
+      const linkCount = (db.db.prepare('SELECT COUNT(*) as c FROM links').get() as any).c;
+      const hasVectors = db.hasVectorIndex();
+      const dbSize = existsSync(dbPath) ? Math.round(readFileSync(dbPath).length / 1024) : 0;
+
+      db.close();
+
+      const text = [
+        `Index: ${dbPath}`,
+        `Size: ${dbSize} KB`,
+        `Collections: ${cols.length}`,
+        ...cols.map((c) => `  ${c.name}: ${c.docCount} docs, ${c.activeCount} embedded`),
+        `Total documents: ${docCount}`,
+        `Total chunks: ${chunkCount}`,
+        `Links: ${linkCount}`,
+        `Vectors: ${hasVectors ? 'yes' : 'no'}`,
+      ].join('\n');
+
+      return {
+        content: [{ type: 'text', text }],
+        details: { collections: cols, docCount, hasVectors },
+      };
+    },
+  });
+}

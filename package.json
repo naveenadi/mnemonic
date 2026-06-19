@@ -1,0 +1,58 @@
+{
+  "name": "@pi/mnemonic",
+  "version": "0.1.0",
+  "description": "On-device hybrid search for markdown knowledge bases. BM25 + vector + LLM reranking with link graphs, time decay, and HyDE. Designed for pi coding agent.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "mne": "bin/mne"
+  },
+  "files": [
+    "bin/",
+    "dist/",
+    "SKILL.md",
+    "pi-extension/"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsx src/cli/index.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "better-sqlite3": "^12.10.0",
+    "fast-glob": "^3.3.3",
+    "node-llama-cpp": "^3.18.1",
+    "picomatch": "^4.0.4",
+    "sqlite-vec": "^0.1.9",
+    "yaml": "^2.9.0",
+    "zod": "^4.2.1"
+  },
+  "optionalDependencies": {
+    "sqlite-vec-darwin-arm64": "^0.1.9"
+  },
+  "peerDependencies": {
+    "typescript": "^5.9.0"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "keywords": [
+    "search",
+    "markdown",
+    "knowledge-base",
+    "vector-search",
+    "bm25",
+    "rag",
+    "mcp",
+    "local-ai",
+    "semantic-search"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.19.21"
+  }
+}
