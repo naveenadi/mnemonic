@@ -22,6 +22,14 @@ interface CliContext {
 }
 
 export async function main(args: string[]) {
+  // Quick check for --version before any flag processing
+  if (args.includes('--version')) {
+    const { readFileSync } = await import('node:fs');
+    const pkg = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf-8'));
+    console.log(`mnemonic v${pkg.version}`);
+    return;
+  }
+
   // Find the first positional argument (skip flags and their values)
   let cmdIdx = 0;
   while (cmdIdx < args.length) {
@@ -40,6 +48,8 @@ export async function main(args: string[]) {
     printHelp();
     return;
   }
+
+
 
   const verbose = args.includes('--verbose') || args.includes('-v');
   const dbPath = resolve(getArg(args, '--db') ?? DEFAULT_DB);
@@ -133,6 +143,7 @@ Options:
   --json                   JSON output
   --no-rerank              Skip LLM reranking
   -v, --verbose            Verbose output
+  --version                Show version number
 `);
 }
 
