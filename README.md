@@ -2,6 +2,12 @@
 
 On-device hybrid search for markdown knowledge bases. BM25 + vector + LLM reranking with link graphs, time decay, and HyDE. Designed for [pi](https://github.com/earendil-works/pi) coding agent.
 
+## Quick Start
+
+### Global mode (default)
+
+All collections share one index at `~/.cache/mnemonic/index.sqlite`. Search everything at once.
+
 ```bash
 npm install -g @naveenadi/mnemonic
 mne init
@@ -9,6 +15,18 @@ mne collection add ~/notes --name notes
 mne index
 mne embed
 mne query "what was the Q4 planning discussion"
+```
+
+### Project-local mode
+
+Use `--db` for a per-repo index. Keeps project docs separate.
+
+```bash
+mne --db .mnemonic/index.sqlite init
+mne --db .mnemonic/index.sqlite collection add . --name myproject
+mne --db .mnemonic/index.sqlite index
+mne --db .mnemonic/index.sqlite embed
+mne --db .mnemonic/index.sqlite query "deploy steps"
 ```
 
 ## Features
