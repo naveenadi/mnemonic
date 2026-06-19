@@ -45,17 +45,18 @@ mne --db .mnemonic/index.sqlite query "deploy steps"
 
 ## Pi Integration
 
-Three layers:
+Three layers, each installable **globally** (all projects) or **per project**.
 
-| Layer | What | How |
-|---|---|---|
-| **Pi Skill** | `SKILL.md` | Bash commands via `mne search`, `mne query`, `mne get` |
-| **MCP Server** | `mne mcp` | Stdio + HTTP, typed tools: `query`, `get`, `multi_get`, `status` |
-| **Pi Extension** | `src/pi-extension/index.ts` | 4 custom tools registered with `pi.registerTool()` |
+| Layer | What | Global path | Per-project path |
+|---|---|---|---|
+| **MCP server** | Typed tools: `query`, `get`, `multi_get`, `status` | `~/.pi/agent/mcp.json` | `.pi/mcp.json` |
+| **Pi skill** | Bash commands via `SKILL.md` | `~/.pi/agent/skills/mnemonic/` | `.pi/skills/mnemonic/` |
+| **Pi extension** | 4 custom `pi.registerTool()` calls | `~/.pi/agent/extensions/mnemonic/` | `.pi/extensions/mnemonic/` |
 
-Configure MCP in `~/.pi/agent/mcp.json`:
+### MCP — global
 
 ```json
+// ~/.pi/agent/mcp.json
 {
   "mcpServers": {
     "mnemonic": {
@@ -65,6 +66,38 @@ Configure MCP in `~/.pi/agent/mcp.json`:
     }
   }
 }
+```
+
+### MCP — per project
+
+Same config in `.pi/mcp.json` (project root).
+
+### Skill — global
+
+```bash
+mkdir -p ~/.pi/agent/skills/mnemonic
+cp SKILL.md ~/.pi/agent/skills/mnemonic/
+```
+
+### Skill — per project
+
+```bash
+mkdir -p .pi/skills/mnemonic
+cp SKILL.md .pi/skills/mnemonic/
+```
+
+### Extension — global
+
+```bash
+mkdir -p ~/.pi/agent/extensions/mnemonic
+cp src/pi-extension/index.ts ~/.pi/agent/extensions/mnemonic/
+```
+
+### Extension — per project
+
+```bash
+mkdir -p .pi/extensions/mnemonic
+cp src/pi-extension/index.ts .pi/extensions/mnemonic/
 ```
 
 ## Architecture
@@ -109,8 +142,10 @@ mne mcp                      Start MCP server
 ## References
 
 - `SKILL.md` — Pi skill for agentic workflows (dig loop, cross-reference, setup)
-- `references/setup.md` — Detailed setup and diagnostics
+- `references/setup.md` — Detailed CLI setup and diagnostics
+- `references/pi-integration.md` — Pi integration: MCP, skill, extension (both modes)
 - `references/link-graph.md` — Cross-reference commands and usage
+- `src/pi-extension/` — Pi extension source + standalone package.json
 
 ## License
 

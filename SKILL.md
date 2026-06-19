@@ -81,7 +81,19 @@ mne index                        # Scan files, build FTS5
 mne embed                        # Generate vector embeddings
 ```
 
-See [references/setup.md](references/setup.md) for project-local mode and diagnostics.
+See [references/setup.md](references/setup.md) for project-local `--db` mode, diagnostics, and maintenance.
+
+### Pi integration
+
+mnemonic integrates at three pi layers — MCP, skill, and extension. Each can be installed globally (all projects) or project-local (per repo).
+
+| Layer | Global | Per project |
+|---|---|---|
+| MCP | `~/.pi/agent/mcp.json` | `.pi/mcp.json` |
+| Skill | `~/.pi/agent/skills/mnemonic/` | `.pi/skills/mnemonic/` |
+| Extension | `~/.pi/agent/extensions/mnemonic/` | `.pi/extensions/mnemonic/` |
+
+Full instructions at [references/pi-integration.md](references/pi-integration.md).
 
 ## Pitfalls
 

@@ -13,7 +13,8 @@
     "dist/",
     "SKILL.md",
     "pi-extension/",
-    "references/"
+    "references/",
+    "src/pi-extension/package.json"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",

@@ -24,6 +24,53 @@ mne --db .mnemonic/index.sqlite index
 mne --db .mnemonic/index.sqlite query "something in this repo"
 ```
 
+## Pi integration (all three layers)
+
+Each layer — MCP server, skill, extension — can be installed globally or per project.
+
+### MCP server
+
+```bash
+# Global: add to ~/.pi/agent/mcp.json
+{
+  "mcpServers": {
+    "mnemonic": {
+      "command": "mne",
+      "args": ["mcp"],
+      "lifecycle": "keep-alive"
+    }
+  }
+}
+
+# Per project: same format in .pi/mcp.json
+```
+
+### Skill
+
+```bash
+# Global
+mkdir -p ~/.pi/agent/skills/mnemonic
+cp SKILL.md ~/.pi/agent/skills/mnemonic/
+
+# Per project (auto-discovered after trust)
+mkdir -p .pi/skills/mnemonic
+cp SKILL.md .pi/skills/mnemonic/
+```
+
+### Extension
+
+```bash
+# Global
+mkdir -p ~/.pi/agent/extensions/mnemonic
+cp src/pi-extension/index.ts ~/.pi/agent/extensions/mnemonic/
+
+# Per project
+mkdir -p .pi/extensions/mnemonic
+cp src/pi-extension/index.ts .pi/extensions/mnemonic/
+```
+
+Full reference: [pi-integration.md](pi-integration.md)
+
 ## Diagnostics
 
 ```bash

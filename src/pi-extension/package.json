@@ -1,0 +1,11 @@
+{
+  "name": "mnemonic-pi-extension",
+  "version": "0.1.0",
+  "description": "Pi extension for mnemonic — 4 custom tools for local markdown search",
+  "dependencies": {
+    "@naveenadi/mnemonic": "^0.1.0"
+  },
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}

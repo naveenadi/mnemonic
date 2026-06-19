@@ -6,6 +6,13 @@ import { join } from 'node:path';
 export default function (pi: ExtensionAPI) {
   const dbPath = join(homedir(), '.cache', 'mnemonic', 'index.sqlite');
 
+  // Helper: load mnemonic modules from the installed global package
+  async function loadMnemonic() {
+    // The installed package exposes dist/ at the global path
+    const mod = await import('@naveenadi/mnemonic');
+    return mod;
+  }
+
   // ─── Tool: mnemonic_search ─────────────────────────────────────
   pi.registerTool({
     name: 'mnemonic_search',
@@ -23,9 +30,8 @@ export default function (pi: ExtensionAPI) {
     }),
     async execute(toolCallId, params, signal, onUpdate, ctx) {
       const { query, collection, limit } = params;
+      const { MnemonicDB, SearchPipeline } = await loadMnemonic();
 
-      const { MnemonicDB } = await import('../store/database.js');
-      const { SearchPipeline } = await import('../search/pipeline.js');
       const db = new MnemonicDB(dbPath);
       db.init();
       const pipeline = new SearchPipeline(db);
@@ -68,10 +74,7 @@ export default function (pi: ExtensionAPI) {
     }),
     async execute(toolCallId, params, signal, onUpdate, ctx) {
       const { query, intent, collection, limit, rerank } = params;
-
-      const { MnemonicDB } = await import('../store/database.js');
-      const { SearchPipeline } = await import('../search/pipeline.js');
-      const { detectLLMBackend } = await import('../llm/factory.js');
+      const { MnemonicDB, SearchPipeline, detectLLMBackend } = await loadMnemonic();
 
       const db = new MnemonicDB(dbPath);
       db.init();
@@ -96,7 +99,6 @@ export default function (pi: ExtensionAPI) {
         hyde: true,
       });
 
-      // Cleanup LLM if loaded
       if ((pipeline as any).llm) {
         await (pipeline as any).llm.close();
       }
@@ -133,9 +135,8 @@ export default function (pi: ExtensionAPI) {
     }),
     async execute(toolCallId, params, signal, onUpdate, ctx) {
       const { file, maxLines, fromLine, lineNumbers } = params;
+      const { MnemonicDB, DocumentStore } = await loadMnemonic();
 
-      const { MnemonicDB } = await import('../store/database.js');
-      const { DocumentStore } = await import('../store/documents.js');
       const db = new MnemonicDB(dbPath);
       db.init();
       const docs = new DocumentStore(db);
@@ -160,7 +161,7 @@ export default function (pi: ExtensionAPI) {
 
       if (lineNumbers !== false) {
         const start = fromLine ?? 1;
-        result.content.split('\n').forEach((line: string, i: number) => {
+        result.content.split('\n').forEach((line, i) => {
           output += `${start + i}: ${line}\n`;
         });
       } else {
@@ -185,8 +186,7 @@ export default function (pi: ExtensionAPI) {
     ],
     parameters: Type.Object({}),
     async execute(toolCallId, params, signal, onUpdate, ctx) {
-      const { MnemonicDB } = await import('../store/database.js');
-      const { CollectionStore } = await import('../store/collections.js');
+      const { MnemonicDB, CollectionStore } = await loadMnemonic();
       const { existsSync, readFileSync } = await import('node:fs');
 
       const db = new MnemonicDB(dbPath);
@@ -206,7 +206,7 @@ export default function (pi: ExtensionAPI) {
         `Index: ${dbPath}`,
         `Size: ${dbSize} KB`,
         `Collections: ${cols.length}`,
-        ...cols.map((c) => `  ${c.name}: ${c.docCount} docs, ${c.activeCount} embedded`),
+        ...cols.map((c: any) => `  ${c.name}: ${c.docCount} docs, ${c.activeCount} embedded`),
         `Total documents: ${docCount}`,
         `Total chunks: ${chunkCount}`,
         `Links: ${linkCount}`,
