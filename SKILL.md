@@ -73,6 +73,20 @@ See [references/link-graph.md](references/link-graph.md) for full cross-referenc
 
 Never mutate the index unprompted. Only do this when the user asks to add a collection, index a new directory, or run diagnostics.
 
+### Quick setup via pi
+
+If the pi extension is loaded, type `/mne init` — it asks questions interactively:
+
+```
+/mne init
+  → Choose global or project-local scope
+  → Enter directories to index
+  → Index + embed (if Ollama available)
+  → Optionally configure MCP, copy skill
+```
+
+### Manual setup
+
 ```bash
 npm install -g @naveenadi/mnemonic
 mne init
