@@ -1,6 +1,8 @@
 node_modules/
 dist/
 *.sqlite
+pnpm-lock.yaml
+pnpm-workspace.yaml
 .env
 .DS_Store
 *.log
