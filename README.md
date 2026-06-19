@@ -106,6 +106,12 @@ mne orphans                  Find orphan documents
 mne mcp                      Start MCP server
 ```
 
+## References
+
+- `SKILL.md` — Pi skill for agentic workflows (dig loop, cross-reference, setup)
+- `references/setup.md` — Detailed setup and diagnostics
+- `references/link-graph.md` — Cross-reference commands and usage
+
 ## License
 
 MIT
