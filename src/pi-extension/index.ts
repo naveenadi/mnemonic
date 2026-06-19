@@ -77,12 +77,12 @@ export default function (pi: ExtensionAPI) {
       ? join(ctx.cwd, '.mnemonic', 'index.sqlite')
       : join(homedir(), '.cache', 'mnemonic', 'index.sqlite');
 
-    // 3. Init DB
-    run(`mne${isProject ? ` --db "${indexDb}"` : ''} init`);
+    // 3. Init DB (subcommand first to avoid flag-ordering issues)
+    run(`mne init${isProject ? ` --db "${indexDb}"` : ''}`);
     ctx.ui.notify(isProject ? 'Initialized project index' : 'Initialized global index', 'info');
 
     // 4. Add collections — ask for directories
-    const mneQuiet = isProject ? `--db "${indexDb}"` : '';
+    const mneOpts = isProject ? `--db "${indexDb}"` : '';
 
     while (true) {
       const dir = await ctx.ui.input(
@@ -102,7 +102,7 @@ export default function (pi: ExtensionAPI) {
         '**/*.md'
       );
 
-      run(`mne ${mneQuiet} collection add "${dir}" --name "${name}"${mask !== '**/*.md' ? ` --mask "${mask}"` : ''}`);
+      run(`mne collection add "${dir}" --name "${name}"${mask !== '**/*.md' ? ` --mask "${mask}"` : ''} ${mneOpts}`.trim());
       ctx.ui.notify(`Added collection: ${name}`, 'info');
     }
 
@@ -110,7 +110,7 @@ export default function (pi: ExtensionAPI) {
     const doIndex = await ctx.ui.confirm('Index', 'Scan files and build the full-text index?');
     if (doIndex) {
       ctx.ui.setStatus('mne', 'Indexing files...');
-      run(`mne ${mneQuiet} index`);
+      run(`mne index ${mneOpts}`.trim());
       ctx.ui.setStatus('mne', undefined);
       ctx.ui.notify('Index complete', 'info');
     }
@@ -129,7 +129,7 @@ export default function (pi: ExtensionAPI) {
       const doEmbed = await ctx.ui.confirm('Embeddings', 'Generate vector embeddings via Ollama? (improves semantic search quality)');
       if (doEmbed) {
         ctx.ui.setStatus('mne', 'Embedding documents...');
-        run(`mne ${mneQuiet} embed`);
+        run(`mne embed ${mneOpts}`.trim());
         ctx.ui.setStatus('mne', undefined);
         ctx.ui.notify('Embeddings complete', 'info');
       }

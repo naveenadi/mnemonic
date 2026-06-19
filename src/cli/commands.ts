@@ -22,7 +22,19 @@ interface CliContext {
 }
 
 export async function main(args: string[]) {
-  const [command, ...rest] = args;
+  // Find the first positional argument (skip flags and their values)
+  let cmdIdx = 0;
+  while (cmdIdx < args.length) {
+    const a = args[cmdIdx];
+    if (a === '--db') {
+      cmdIdx += 2; // skip --db and its value
+    } else if (a.startsWith('-')) {
+      cmdIdx += 1; // skip other flags
+    } else {
+      break; // found the command
+    }
+  }
+  const [command, ...rest] = args.slice(cmdIdx);
 
   if (!command || command === 'help' || command === '--help') {
     printHelp();
